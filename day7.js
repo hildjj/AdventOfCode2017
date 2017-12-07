@@ -50,7 +50,7 @@ function check (n) {
   // 1: no chance for inbalance
   // 2: violates "exactly one" from the rules
   if (n.children.length < 3) {
-    return true
+    return null
   }
 
   // partition into two groups.
@@ -60,7 +60,7 @@ function check (n) {
   let right, bad
   switch (groups[1].length) {
     case 0:
-      return true
+      return null
     case 1:
       bad = groups[1][0]
       right = first
@@ -69,21 +69,26 @@ function check (n) {
       bad = groups[0][0]
       right = graf[groups[1][0]].total
   }
-
-  // One of these things is not like the other
-  // https://www.youtube.com/watch?v=MdHvH2noS8U
-  console.log(graf[bad].weight - graf[bad].total + right)
-  return false
+  const nbad = graf[bad]
+  nbad.correct = right
+  return nbad
 }
 
 function depthFirst (nm) {
   const n = graf[nm]
-  if (!n.children.every(c => depthFirst(c))) {
-    return false
+  for (const c of n.children) {
+    const answer = depthFirst(c)
+    if (answer) {
+      return answer
+    }
   }
   n.total = n.weight +
     n.children.reduce((p, c) => p + graf[c].total, 0)
   return check(n)
 }
 
-depthFirst(root)
+const bad = depthFirst(root)
+
+// // One of these things is not like the other
+// // https://www.youtube.com/watch?v=MdHvH2noS8U
+console.log(bad.weight - bad.total + bad.correct)
