@@ -9,8 +9,9 @@ const routes = {}
 for (const line of lines) {
   const m = line.match(/^(\d+)\s*<->\s*([0-9, ]+)/)
   if (!m) continue
-  let r = routes[m[1]] || (routes[m[1]] = [])
-  r.push(...(m[2].split(/\s*,\s*/))) // careful not to create new array
+  const ends = m[2].split(/\s*,\s*/)
+  const r = routes[m[1]]
+  routes[m[1]] = r ? new Set(...r, ...ends) : new Set(ends)
 }
 
 const VISITED = Symbol('VISITED')
